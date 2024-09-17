@@ -182,7 +182,16 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 						if(isModEnabled('multicurrency')) $strToFind[] = 'td.linecoluht_currency';
                     ?>
 			  		$('table#tablelines tr[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref').each(function(i,item) {
-			  			value = $(item).html();
+
+						let textsChildren = [ $(item).text().trim() ];
+						if($(item).length){
+							$(item).each(function( index ) {
+								if($(this).text().match(/ +/, false))
+									textsChildren.push($( this ).text());
+							});
+						}
+						value = textsChildren.join('').trim();
+
 			  			if(value=='&nbsp;')value='';
 
 			  			lineid = $(item).closest('tr').attr('id').substr(4);

@@ -183,14 +183,17 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                     ?>
 			  		$('table#tablelines tr[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref').each(function(i,item) {
 
-						let textsChildren = [ $(item).text().trim() ];
-						if($(item).length){
+						let textsChildren = [];
+						if($(item).text().trim().length == 0 && $(item).length){
 							$(item).each(function( index ) {
 								if($(this).text().match(/ +/, false))
-									textsChildren.push($( this ).text());
+									textsChildren.push($( this ).text().trim());
 							});
+							value = textsChildren.join('');
 						}
-						value = textsChildren.join('').trim();
+						else{
+							value = $(item).text().trim();
+						}
 
 			  			if(value=='&nbsp;')value='';
 
@@ -254,14 +257,26 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 							});
 
 			  				$input.blur(function() {
-			  					var value = $(this).val();
+
+								var value = $(this).val();
+
+
+
 			  					var col = $link.attr('col');
 			  					var lineid = $link.attr('lineid');
 				  				var objectid = $link.attr('objectid');
 				  				var objectelement = $link.attr('objectelement');
 				  				$link.show();
-				  				$link.html('...');
+				  				$link.text('...');
 			  					$input.hide();
+
+
+								if (value.trim().length === 0 && $input.attr('list')) {
+									// The string is an empty string skip update
+									$link.text($link.attr('value'));
+									return;
+								}
+
 			  					$.ajax({
 			  						url:"<?php echo dol_buildpath('/quickcustomerprice/script/interface.php',1) ?>"
 			  						,data: {

@@ -21,6 +21,8 @@
 	$value = GETPOST('value');
 	$code_extrafield = GETPOST('code_extrafield');
 
+	$langs->load('quickcustomerprice@quickcustomerprice');
+
 	switch ($put) {
 		case 'price':
 
@@ -137,6 +139,9 @@ function _updateObjectLine($objectid, $objectelement,$lineid,$column, $value) {
 				$total_ht = $o->line->total_ht;
 				$multicurrency_total_ht = $o->line->multicurrency_total_ht;
 				$uttc = $o->line->subprice + ($o->line->subprice * $o->line->tva_tx) / 100;
+			}else{
+				$res = -1;
+				$o->error = $langs->trans('ProductMinPriceError');
 			}
 		}
 		else if ($objectelement == "CommandeFournisseur")
@@ -293,7 +298,6 @@ function checkPriceMin(CommonObjectLine $line, float $price) : int {
 
 	if(((getDolGlobalString('MAIN_USE_ADVANCED_PERMS') && ! $user->hasRight('produit', 'ignore_price_min_advance')) || ! getDolGlobalString('MAIN_USE_ADVANCED_PERMS')) && ($price_min && (price2num($price) * (1 - price2num(floatval(GETPOST('remise_percent'))) / 100) < price2num($price_min)))) {
 		$langs->load('products');
-		$o->error = $langs->trans('CantBeLessThanMinPrice', price(price2num($price_min, 'MU'), 0, $langs, 0, 0, -1, $conf->currency));
 		$error++;
 	}
 

@@ -5,3 +5,5 @@ ATMAbout = This module has been developed by <a href="http://www.atm-consulting.
 
 quickcustomerpriceSetup = quickeditline module setup
 quickcustomerpriceAbout = About quickeditline
+
+ProductMinPriceError = Fianl price can't be less than product min price

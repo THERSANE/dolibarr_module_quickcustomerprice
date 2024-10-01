@@ -8,3 +8,4 @@ quickcustomerpriceAbout = A propos du module Modification de ligne rapide
 
 QCP_ALLOW_CHANGE_ON_VALIDATE=Autoriser la modification d'élément validé
 QCP_ENABLE_SUPPLIER_PART=Activer la prise en charge de la partie fournisseur
+ProductMinPriceError = Le prix final ne peut être inférieur au prix minimum défini sur le produit

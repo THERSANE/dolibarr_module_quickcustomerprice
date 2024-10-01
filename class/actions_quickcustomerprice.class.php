@@ -320,8 +320,19 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                                         priceCallbacks.forEach((callback) => {
                                             callback(lineid, data);
                                         });
-									}else if (data.error == 'updateFailed'){
-										$('tr[id=row-'+lineid+'] td.linecoluht a').html(data.msg);
+									}else if (data.error == 'updateFailed' && typeof data.msg != undefined && data.msg.length > 0){
+
+										let jnotifyConf = {
+											delay: 1500                               // the default time to show each notification (in milliseconds)
+											, type : 'error'
+											, sticky: true                             // determines if the message should be considered "sticky" (user must manually close notification)
+											, closeLabel: "&times;"                     // the HTML to use for the "Close" link
+											, showClose: true                           // determines if the "Close" link should be shown if notification is also sticky
+											, fadeSpeed: 150                           // the speed to fade messages out (in milliseconds)
+											, slideSpeed: 250                           // the speed used to slide messages out (in milliseconds)
+										};
+
+										$.jnotify(data.msg, jnotifyConf);
 									}
 			  					});
 

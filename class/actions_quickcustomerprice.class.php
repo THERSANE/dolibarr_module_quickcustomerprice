@@ -460,11 +460,18 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 						}
 
 						//Wysiwyg
-						if(type == 'text') {
+						if(type == 'html') {
                             elem = $(this).siblings('div')[0];
                             iframe = $(elem).find("iframe")[0];
                             value = (iframe.contentWindow.document.body.innerHTML);
 						}
+
+
+						if(type == 'text') {
+							siblings = $(this).siblings('textarea');
+							value = $(siblings[0]).val();
+						}
+
 						/*
 						 * Type date
 						 */
@@ -493,13 +500,13 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                         /*
                          * Select
                          */
-                        if(type == 'select' || type == 'sellist') {
+                        if(type == 'select' || type == 'sellist') {
                             value = $($(this).siblings('select')[0]).val();
                         }
                         /*
 						* Multiselect
 						*/
-                        if(type == 'checkbox' || type == 'chkbxlst') {
+                        if(type == 'checkbox' || type == 'chkbxlst') {
                             value = $($(this).siblings('select')[0]).select2('val');
                         }
                         /*

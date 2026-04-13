@@ -181,7 +181,11 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                         if(isModEnabled('margin')) $strToFind[] = 'td.linecolmargin1';
 						if(isModEnabled('multicurrency')) $strToFind[] = 'td.linecoluht_currency';
                     ?>
-			  		$('table#tablelines tr[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref').each(function(i,item) {
+
+
+
+					let inlineEditRowsInit = function (elsToInit) {
+						elsToInit.each(function(i,item) {
 
 						let textsChildren = [];
 						if($(item).text().trim().length == 0 && $(item).length){
@@ -341,6 +345,9 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 			  			});
 
 			  		});
+					}
+
+					inlineEditRowsInit($('table#tablelines tr[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref'));
 
 					/*
 					 * Extrafields
@@ -361,28 +368,44 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 					<?php
 					}?>
 
-					elements.each(function () {
-						let lineid = $(this).closest('tr').attr('id').substr(4);
+					let initExtraElements = function (elements) {
+						elements.each(function () {
+							let lineid = $(this).closest('tr').attr('id').substr(4);
 
-						$a = $('<a class="blue quick-edit-extras" style="cursor:pointer;" />');
-                        $a.attr('href', 'javascript:;');
-                        $a.attr('lineid', lineid);
-                        $a.attr('objectid', '<?php echo $object->id; ?>');
-                        $a.attr('objectelement', '<?php echo $object->element; ?>');
-                        $a.html('<?php echo img_edit(); ?>');
+							$a = $('<a class="blue quick-edit-extras" style="cursor:pointer;" />');
+							$a.attr('href', 'javascript:;');
+							$a.attr('lineid', lineid);
+							$a.attr('objectid', '<?php echo $object->id; ?>');
+							$a.attr('objectelement', '<?php echo $object->element; ?>');
+							$a.html('<?php echo img_edit(); ?>');
 
-						<?php if(floatval(DOL_VERSION) < 14) { ?>
-                            $(this).closest('td').attr('colspan', $(this).closest('td').attr('colspan')-2);
-                            $(this).closest('td').after($a);
-                            $a.wrap('<td></td>');
+							<?php if(floatval(DOL_VERSION) < 14) { ?>
+								$(this).closest('td').attr('colspan', $(this).closest('td').attr('colspan')-2);
+								$(this).closest('td').after($a);
+								$a.wrap('<td></td>');
 
-						<?php } else {?>
-                            $(this).after($a);
-                            $(this).after("&nbsp;&nbsp;&nbsp;");
-                    <?php }?>
-                          });
+							<?php } else {?>
+								$(this).after($a);
+								$(this).after("&nbsp;&nbsp;&nbsp;");
+							<?php }?>
+						});
+					}
+
+					initExtraElements(elements);
+
+					if(typeof Dolibarr !== "undefined") {
+						Dolibarr.on('reloadDocumentLine', /** @param {{lineId:number, lineElement:string}} data */  function (data) {
+							Dolibarr.log('triggered by hook reloadDocumentLine : actions_quickcustomerprice.class.php')
+							let $row = $('#row-' + data.lineId);
+
+							initExtraElements( $row.find('[id*=\'extras\']'));
+
+							inlineEditRowsInit($('table#tablelines tr'+'#row-' + data.lineId +'[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref'));
+						});
+					}
+
 					//On affiche l'input
-			  		$(".quick-edit-extras").on('click',function(){
+					$(document).on('click', '#tablelines .quick-edit-extras', function () {
                         <?php if(floatval(DOL_VERSION) < 14) { ?>
                             let extraTd = $(this).closest('td').prev(); //On récupère la td juste avant l'icone edit (qui est la td contenant l'extrafield puisqu'on a fait un after)
                             let extrafieldCode = '';

@@ -324,6 +324,10 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                                         priceCallbacks.forEach((callback) => {
                                             callback(lineid, data);
                                         });
+
+										if(typeof Dolibarr != 'undefined') {
+											Dolibarr.executeHook('quickCustomerPrice:PriceValue', {lineId: lineid, lineElement: objectelement, data});
+										}
 									}else if (data.error == 'updateFailed' && typeof data.msg != undefined && data.msg.length > 0){
 
 										let jnotifyConf = {
@@ -338,6 +342,7 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 
 										$.jnotify(data.msg, jnotifyConf);
 									}
+
 			  					});
 
 			  				});
@@ -406,12 +411,13 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 
 					//On affiche l'input
 					$(document).on('click', '#tablelines .quick-edit-extras', function () {
+						let spanToEdit = '';
                         <?php if(floatval(DOL_VERSION) < 14) { ?>
                             let extraTd = $(this).closest('td').prev(); //On récupère la td juste avant l'icone edit (qui est la td contenant l'extrafield puisqu'on a fait un after)
                             let extrafieldCode = '';
-                            let spanToEdit = extraTd.find('span');
+                            spanToEdit = extraTd.find('span');
                         <?php } else {?>
-                             let spanToEdit = $(this).prev('div');
+                             spanToEdit = $(this).prev('div');
                         <?php }?>
                         if(spanToEdit.length == 0) spanToEdit = extraTd;
                         let TClassExtra = spanToEdit.attr('class').split(' ');
@@ -445,6 +451,10 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
                             ,dataType:'html'
                         }).done(function(data) {
                             spanToEdit.html(data);
+
+                            if(typeof Dolibarr != 'undefined') {
+								Dolibarr.executeHook('quickCustomerPrice:ExtrafieldValue', {lineId: lineid, lineElement: objectelement});
+							}
                         });
                         <?php if(floatval(DOL_VERSION) >= 14) { ?>
                             $(this).hide();

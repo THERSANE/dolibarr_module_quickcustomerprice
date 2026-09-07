@@ -185,8 +185,11 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 
 
 					let inlineEditRowsInit = function (elsToInit) {
-						elsToInit.each(function(i,item) {
 
+						let value;
+						let col;
+
+						elsToInit.each(function(i,item) {
 						let textsChildren = [];
 						if($(item).text().trim().length == 0 && $(item).length){
 							$(item).each(function( index ) {
@@ -201,9 +204,11 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 
 			  			if(value=='&nbsp;')value='';
 
-			  			lineid = $(item).closest('tr').attr('id').substr(4);
+			  			let lineid = $(item).closest('tr').attr('id').substr(4);
 
-						if(TIDLinesToChange.indexOf(lineid) == -1) return;
+						if (TIDLinesToChange.indexOf(lineid) == -1) {
+							return;
+						}
 
 						if($(item).hasClass('linecoldiscount')) {
 							col='remise_percent';
@@ -221,7 +226,7 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 							col = 'price';
 						}
 
-			  			$a = $('<a class="blue" style="text-decoration:underline;cursor:text;" />');
+			  			let $a = $('<a class="blue" style="text-decoration:underline;cursor:text;" />');
 			  			$a.attr('href', "javascript:;");
 			  			$a.attr('value', value);
 			  			$a.attr('col', col);
@@ -403,9 +408,22 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 							Dolibarr.log('triggered by hook reloadDocumentLine : actions_quickcustomerprice.class.php')
 							let $row = $('#row-' + data.lineId);
 
-							initExtraElements( $row.find('[id*=\'extras\']'));
+							$.ajax({
+								url:"<?php echo dol_buildpath('/quickcustomerprice/script/interface.php',1) ?>"
+								,data: {
+									get:'get-TIDLinesToChange',
+									objectid: '<?php echo $object->id; ?>',
+									objectelement: '<?php echo $object->element; ?>'
+								}
+								,dataType:'json'
+							}).done(function(data) {
+								if(data) {
+									TIDLinesToChange = data;
+									inlineEditRowsInit($row.find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref'));
+									initExtraElements( $row.find('[id*=\'extras\']'));
+								}
+							});
 
-							inlineEditRowsInit($('table#tablelines tr'+'#row-' + data.lineId +'[id]').find('<?php echo implode(',', $strToFind); ?>'+',td.linecolcycleref'));
 						});
 					}
 
@@ -584,7 +602,7 @@ class Actionsquickcustomerprice extends quickcustomerprice\RetroCompatCommonHook
 		}
 	}
 
-	private function _getTIDLinesToChange($object) {
+	static function _getTIDLinesToChange($object) {
 		$TRes = array();
 
 		if(! empty($object->lines)) {

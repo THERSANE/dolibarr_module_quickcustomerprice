@@ -41,7 +41,22 @@
 
 			echo _showExtrafield($objectelement, $lineid, $code_extrafield);
 			break;
+		case 'get-TIDLinesToChange':
 
+			require_once __DIR__ . '/../class/actions_quickcustomerprice.class.php';
+			$objectid = GETPOST('objectid');
+			$objectelement = GETPOST('objectelement');
+			$object = fetchObjectByElement($objectid, $objectelement);
+			if($object <= 0) {
+				header('Content-Type: application/json');
+				print json_encode([]);
+				break;
+			}
+
+			$data = Actionsquickcustomerprice::_getTIDLinesToChange($object);
+			header('Content-Type: application/json');
+			print json_encode($data);
+			break;
 	}
 
 function _updateObjectLine($objectid, $objectelement,$lineid,$column, $value) {
